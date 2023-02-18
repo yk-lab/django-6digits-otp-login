@@ -1,0 +1,32 @@
+services:
+  app:
+    container_name: app
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+    restart: on-failure
+    env_file: ./.env
+    command: python3 manage.py runserver 0.0.0.0:8500
+    volumes:
+      - .:/app:cached
+      - virtualenv:/app/.venv
+    depends_on:
+      - db
+    ports:
+      - '8500:8500'
+
+  db:
+    container_name: app-db
+    image: postgres:14
+    restart: on-failure
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: "app"
+      POSTGRES_USER: "app"
+      POSTGRES_PASSWORD: "password"
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+
+volumes:
+  virtualenv:
+  pgdata:
